@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KASE Budget Monitoring Portal</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand: #0e5774;
+            --brand-dark: #0a3f54;
+            --brand-deep: #07293a;
+            --brand-mid: #1a7a9f;
+            --brand-light: #d6eef5;
+            --brand-xlight: #edf7fb;
+            --accent: #e8a838;
+            --accent-dim: #f5d98c;
+            --bg: #f0f4f7;
+            --surface: #ffffff;
+            --surface-2: #f7fafc;
+            --border: rgba(14,87,116,0.12);
+            --border-strong: rgba(14,87,116,0.22);
+            --text-primary: #0d1f2d;
+            --text-secondary: #3d6070;
+            --text-muted: #7a9aaa;
+            --shadow-sm: 0 1px 3px rgba(14,87,116,0.08), 0 1px 2px rgba(14,87,116,0.06);
+            --shadow-md: 0 4px 16px rgba(14,87,116,0.1), 0 2px 6px rgba(14,87,116,0.06);
+            --shadow-lg: 0 12px 36px rgba(14,87,116,0.14), 0 4px 12px rgba(14,87,116,0.08);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --radius-xl: 24px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .site-header {
+            background: var(--brand-deep);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            height: 64px;
+        }
+
+        .header-text { flex: 1; }
+
+        .header-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.2px;
+        }
+
+        .header-sub {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+        }
+
+        .header-badge {
+            font-size: 11px;
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.55);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .main {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 40px 32px 80px;
+        }
+
+        .section-eyebrow {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--brand-mid);
+            margin-bottom: 6px;
+        }
+
+        .section-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--brand-deep);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 48px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .stat-value {
+            font-family: 'Syne', sans-serif;
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--brand-deep);
+            letter-spacing: -1px;
+            line-height: 1;
+        }
+
+        .stat-value.small { font-size: 18px; line-height: 1.3; }
+
+        .stat-hint {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        .data-section { margin-bottom: 56px; }
+
+        .data-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .search-bar {
+            padding: 12px 20px;
+            width: 320px;
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-bar:focus {
+            border-color: var(--brand-mid);
+        }
+
+        .table-wrap {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        thead th {
+            padding: 14px 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+        }
+
+        tbody tr:hover { background: var(--brand-xlight); }
+
+        tbody td {
+            padding: 16px 20px;
+            font-size: 14px;
+        }
+
+        .sl-cell {
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            color: var(--brand);
+            width: 60px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(7,41,58,0.55);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal {
+            background: var(--surface);
+            border-radius: var(--radius-xl);
+            max-width: 480px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+
+        .modal-header {
+            background: var(--brand-deep);
+            padding: 28px;
+            position: relative;
+        }
+
+        .modal-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+
+        .modal-body { padding: 24px 28px; }
+
+        .modal-field {
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .field-label {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .field-value { font-size: 15px; margin-top: 4px; }
+
+        .field-value.amount {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--brand-deep);
+        }
+
+        .comp-section {
+            margin-top: 20px;
+            background: var(--brand-xlight);
+            border-radius: var(--radius-md);
+            padding: 20px;
+        }
+
+        .comp-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .comp-box {
+            background: var(--surface);
+            padding: 14px;
+            text-align: center;
+            border-radius: var(--radius-sm);
+        }
+
+        .comp-box-val {
+            font-family: 'Syne', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <div class="header-inner">
+        <div class="header-text">
+            <div class="header-title">KASE Budget Monitoring Portal</div>
+            <div class="header-sub">Kerala Academy for Skills Excellence</div>
+        </div>
+        <div class="header-badge">FY 2025–26</div>
+    </div>
+</header>
+
+<main class="main">
+    <div style="margin-bottom: 32px;">
+        <div class="section-eyebrow">Overview</div>
+        <div class="section-title">Budget Dashboard</div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card" onclick="scrollToSection('budget-section')">
+            <div class="stat-label">Budget Proposal Schemes</div>
+            <div class="stat-value" id="count-s1">—</div>
+            <div class="stat-hint">Click to view proposals</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Budget Proposal Amount</div>
+            <div class="stat-value" id="total-amount-s1">—</div>
+            <div class="stat-hint">₹ in Lakhs</div>
+        </div>
+
+        <div class="stat-card" onclick="scrollToSection('working-section')">
+            <div class="stat-label">Working Group Schemes</div>
+            <div class="stat-value" id="count-s2">—</div>
+            <div class="stat-hint">Click to view group</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Revised Amount</div>
+            <div class="stat-value" id="total-amount-s2">—</div>
+            <div class="stat-hint">₹ in Lakhs</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Heads of Account</div>
+            <div class="stat-value" id="count-hoa">—</div>
+            <div class="stat-hint">Unique codes</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Proposal Status</div>
+            <div class="stat-value small" id="stat-proposal">Loading…</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Administrative Sanction</div>
+            <div class="stat-value small" id="stat-sanction">Loading…</div>
+        </div>
+    </div>
+
+    <div class="data-section">
+        <div id="budget-section" class="data-section-header">
+            <div class="section-title">Budget Proposals</div>
+            <input type="text" class="search-bar" placeholder="Search particulars, divisions, heads..." onkeyup="filterTable('table-s1', this.value)">
+        </div>
+        <div class="table-wrap">
+            <table id="table-s1">
+                <thead>
+                    <tr><th style="width:60px;">Sl No.</th><th>Budget Proposal Particular</th></tr>
+                </thead>
+                <tbody id="body-s1"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="data-section">
+        <div id="working-section" class="data-section-header">
+            <div class="section-title">Working Group Proposals</div>
+            <input type="text" class="search-bar" placeholder="Search particulars, divisions, heads..." onkeyup="filterTable('table-s2', this.value)">
+        </div>
+        <div class="table-wrap">
+            <table id="table-s2">
+                <thead>
+                    <tr><th style="width:60px;">Sl No.</th><th>Working Group Particular</th></tr>
+                </thead>
+                <tbody id="body-s2"></tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<div id="modal-overlay" class="modal-overlay" onclick="closeModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-title" id="modal-title">—</div>
+            <button class="close-btn" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body" id="modal-content"></div>
+    </div>
+</div>
+
+<script>
+    const url1 = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSBA9dF45vgzj6sfu7hmxg7ZCY4ks3_Uki_nmazFVjA8_v6wy9KT9QFMcfuxcT0J5HW262FhBlJEgWG/pub?gid=0&single=true&output=csv";
+    const url2 = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSBA9dF45vgzj6sfu7hmxg7ZCY4ks3_Uki_nmazFVjA8_v6wy9KT9QFMcfuxcT0J5HW262FhBlJEgWG/pub?gid=739922821&single=true&output=csv";
+
+    let dataS1 = [], dataS2 = [];
+
+    async function fetchData() {
+        Papa.parse(url1, {
+            download: true, header: true,
+            complete: (results) => {
+                dataS1 = results.data.filter(row => row['Sl No.'] && row['Sl No.'] !== "" && row['Sl No.'] !== "Total");
+                renderBudgetTable();
+                updateDashboard();
+            }
+        });
+        Papa.parse(url2, {
+            download: true, header: true,
+            complete: (results) => {
+                dataS2 = results.data.filter(row => row['Sl No.'] && row['Sl No.'] !== "" && row['Sl No.'] !== "Total");
+                renderWorkingTable();
+                updateDashboard();
+            }
+        });
+    }
+
+    function updateDashboard() {
+        document.getElementById('count-s1').innerText = dataS1.length || '—';
+        document.getElementById('count-s2').innerText = dataS2.length || '—';
+
+        const totalS1 = dataS1.reduce((sum, row) => sum + (parseFloat(row['Amount (₹ in Lakhs)']) || 0), 0);
+        const totalS2 = dataS2.reduce((sum, row) => sum + (parseFloat(row['Revised Amount (₹ in Lakhs)']) || 0), 0);
+        
+        document.getElementById('total-amount-s1').innerText = totalS1.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+        document.getElementById('total-amount-s2').innerText = totalS2.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+
+        const hoas = new Set([...dataS1.map(r => r['Head of Account']?.trim()), ...dataS2.map(r => r['Head of Account']?.trim())]);
+        hoas.delete(""); 
+        document.getElementById('count-hoa').innerText = hoas.size || '—';
+
+        if (dataS2.length > 0) {
+            const submittedCount = dataS2.filter(r => (r['Proposal submitted status'] || "").trim().toLowerCase() === "submitted").length;
+            document.getElementById('stat-proposal').innerText = `${submittedCount} Submitted · ${dataS2.length - submittedCount} Pending`;
+
+            const sanctionedCount = dataS2.filter(r => {
+                const s = (r['Administrative Sanction Status'] || "").trim().toLowerCase();
+                return s !== "" && s !== "nil" && s !== "n/a";
+            }).length;
+            document.getElementById('stat-sanction').innerText = sanctionedCount > 0 ? `${sanctionedCount} Sanctioned` : "NIL";
+        }
+    }
+
+    function renderBudgetTable() {
+        const tbody = document.getElementById('body-s1');
+        tbody.innerHTML = dataS1.map(row => `
+            <tr onclick="showModal('Budget', '${row['Sl No.']}')">
+                <td class="sl-cell">${row['Sl No.']}</td>
+                <td>${row['Budget Proposal Particular'] || '—'}</td>
+            </tr>`).join('');
+    }
+
+    function renderWorkingTable() {
+        const tbody = document.getElementById('body-s2');
+        tbody.innerHTML = dataS2.map(row => `
+            <tr onclick="showModal('Working', '${row['Sl No.']}')">
+                <td class="sl-cell">${row['Sl No.']}</td>
+                <td>${row['Working Group Proposal Particular'] || '—'}</td>
+            </tr>`).join('');
+    }
+
+    function field(label, value, cls = '') {
+        return `<div class="modal-field"><div class="field-label">${label}</div><div class="field-value ${cls}">${value || '—'}</div></div>`;
+    }
+
+    function showModal(typeLabel, slno) {
+        let title, division, hoa, type, currentAmt, compHtml = "";
+        const row = typeLabel === 'Budget' ? dataS1.find(r => r['Sl No.'] === slno) : dataS2.find(r => r['Sl No.'] === slno);
+        if (!row) return;
+
+        title = row['Budget Proposal Particular'] || row['Working Group Proposal Particular'];
+        division = row['Division'];
+        hoa = row['Head of Account'];
+        type = row['Type'];
+        currentAmt = row['Amount (₹ in Lakhs)'] || row['Revised Amount (₹ in Lakhs)'];
+
+        if (typeLabel === 'Working') {
+            const rowOrig = dataS1.find(r => r['Sl No.'] === slno);
+            if (rowOrig) {
+                compHtml = `<div class="comp-section">
+                    <div class="comp-grid">
+                        <div class="comp-box"><div class="field-label">Original</div><div class="comp-box-val">₹ ${rowOrig['Amount (₹ in Lakhs)']}</div></div>
+                        <div class="comp-box"><div class="field-label">Revised</div><div class="comp-box-val">₹ ${currentAmt}</div></div>
+                    </div></div>`;
+            }
+        }
+
+        document.getElementById('modal-title').innerText = title;
+        document.getElementById('modal-content').innerHTML = field('Division', division) + field('Head of Account', hoa) + field('Type', type) + field('Amount (₹ in Lakhs)', `₹ ${currentAmt}`, 'amount') + compHtml;
+        document.getElementById('modal-overlay').style.display = 'flex';
+    }
+
+    function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; }
+
+    function filterTable(tableId, query) {
+        const q = query.toLowerCase();
+        const rows = document.querySelectorAll(`#${tableId} tbody tr`);
+        
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            const slNo = row.cells[0].innerText;
+            const sourceData = tableId === 'table-s1' ? dataS1 : dataS2;
+            const record = sourceData.find(r => r['Sl No.'] === slNo);
+            
+            // Search across the visible text, plus hidden division and HOA data
+            const division = record ? (record['Division'] || "").toLowerCase() : "";
+            const hoa = record ? (record['Head of Account'] || "").toLowerCase() : "";
+            
+            if (text.includes(q) || division.includes(q) || hoa.includes(q)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    function scrollToSection(id) { document.getElementById(id).scrollIntoView({ behavior: 'smooth' }); }
+    fetchData();
+</script>
+</body>
+</html>
