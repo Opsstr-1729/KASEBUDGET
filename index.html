@@ -229,6 +229,15 @@
             width: 60px;
         }
 
+        /* Summary Row Styles */
+        tfoot td {
+            padding: 16px 20px;
+            background: var(--brand-xlight);
+            font-weight: 700;
+            color: var(--brand-deep);
+            border-top: 2px solid var(--brand-mid);
+        }
+
         .division-filter-wrap {
             display: inline-block;
             position: relative;
@@ -398,7 +407,6 @@
             font-weight: 700;
         }
 
-        /* ── FOOTER ─────────────────────────────────────── */
         .site-footer {
             background: var(--brand-deep);
             color: rgba(255,255,255,0.5);
@@ -430,7 +438,7 @@
 
     <div class="stats-grid">
         <div class="stat-card" onclick="scrollToSection('budget-section')">
-            <div class="stat-label">Budget Proposal</div>
+            <div class="stat-label">Budget Proposal Schemes</div>
             <div class="stat-value" id="count-s1">—</div>
             <div class="stat-hint">Click to view proposals</div>
         </div>
@@ -440,7 +448,7 @@
             <div class="stat-hint">₹ in Lakhs </div>
         </div>
         <div class="stat-card" onclick="scrollToSection('working-section')">
-            <div class="stat-label">Working Group Proposal</div>
+            <div class="stat-label">Working Group Schemes</div>
             <div class="stat-value" id="count-s2">—</div>
             <div class="stat-hint">Click to view group</div>
         </div>
@@ -464,6 +472,7 @@
         </div>
     </div>
 
+    <!-- BUDGET PROPOSALS TABLE -->
     <div class="data-section">
         <div id="budget-section" class="data-section-header">
             <div class="section-title">Budget Proposals</div>
@@ -487,10 +496,17 @@
                     </tr>
                 </thead>
                 <tbody id="body-s1"></tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="1">Amount</td>
+                        <td id="insight-s1">Total for selected: ₹ 0.00 Lakhs</td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div>
 
+    <!-- WORKING GROUP TABLE -->
     <div class="data-section">
         <div id="working-section" class="data-section-header">
             <div class="section-title">Working Group Proposals</div>
@@ -514,6 +530,12 @@
                     </tr>
                 </thead>
                 <tbody id="body-s2"></tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="1">Amount</td>
+                        <td id="insight-s2">Total for selected: ₹ 0.00 Lakhs</td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div>
@@ -547,6 +569,7 @@
                 populateMultiSelect('multi-div-s1', dataS1, 'table-s1');
                 renderBudgetTable();
                 updateDashboard();
+                filterTable('table-s1'); // Initial insight calculation
             }
         });
         Papa.parse(url2, {
@@ -556,6 +579,7 @@
                 populateMultiSelect('multi-div-s2', dataS2, 'table-s2');
                 renderWorkingTable();
                 updateDashboard();
+                filterTable('table-s2'); // Initial insight calculation
             }
         });
     }
@@ -676,15 +700,18 @@
         const isS1 = tableId === 'table-s1';
         const searchInput = document.getElementById(isS1 ? 'input-s1' : 'input-s2');
         const container = document.getElementById(isS1 ? 'multi-div-s1' : 'multi-div-s2');
+        const insightElement = document.getElementById(isS1 ? 'insight-s1' : 'insight-s2');
         
         const checkedDivs = Array.from(container.querySelectorAll('input:checked')).map(cb => cb.value);
-        
         const q = searchInput.value.toLowerCase();
         const rows = document.querySelectorAll(`#${tableId} tbody tr`);
         
+        let runningTotal = 0;
+        const sourceData = isS1 ? dataS1 : dataS2;
+        const amtKey = isS1 ? 'Amount (₹ in Lakhs)' : 'Revised Amount (₹ in Lakhs)';
+
         rows.forEach(row => {
             const slNo = row.cells[0].innerText;
-            const sourceData = isS1 ? dataS1 : dataS2;
             const record = sourceData.find(r => r['Sl No.'] === slNo);
             
             const division = record ? (record['Division'] || "") : "";
@@ -694,8 +721,17 @@
             const matchesSearch = text.includes(q) || division.toLowerCase().includes(q) || hoa.toLowerCase().includes(q);
             const matchesDivision = checkedDivs.length === 0 || checkedDivs.includes(division);
             
-            row.style.display = (matchesSearch && matchesDivision) ? '' : 'none';
+            if (matchesSearch && matchesDivision) {
+                row.style.display = '';
+                if (record) {
+                    runningTotal += parseFloat(record[amtKey]) || 0;
+                }
+            } else {
+                row.style.display = 'none';
+            }
         });
+
+        insightElement.innerText = `Total for selected: ₹ ${runningTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })} Lakhs`;
     }
 
     function scrollToSection(id) { document.getElementById(id).scrollIntoView({ behavior: 'smooth' }); }
@@ -703,3 +739,4 @@
 </script>
 </body>
 </html>
+```[cite: 1]
