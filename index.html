@@ -387,6 +387,18 @@
             padding: 20px;
         }
 
+        /* Merged Scheme Note Style */
+        .merge-note {
+            margin-top: 12px;
+            font-size: 12px;
+            font-style: italic;
+            color: var(--brand);
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            border: 1px dashed var(--brand-mid);
+        }
+
         .comp-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -556,7 +568,7 @@
     const url1 = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSBA9dF45vgzj6sfu7hmxg7ZCY4ks3_Uki_nmazFVjA8_v6wy9KT9QFMcfuxcT0J5HW262FhBlJEgWG/pub?gid=0&single=true&output=csv";
     const url2 = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSBA9dF45vgzj6sfu7hmxg7ZCY4ks3_Uki_nmazFVjA8_v6wy9KT9QFMcfuxcT0J5HW262FhBlJEgWG/pub?gid=739922821&single=true&output=csv";
 
-    // UPDATED COMPONENT MAPPING FROM YOUR SCREENSHOT[cite: 2]
+    // MAPPING AS PER SCREENSHOT[cite: 2]
     const componentMapping = {
         "1": ["1"],
         "2": ["2"],
@@ -682,6 +694,7 @@
         return `<div class="modal-field"><div class="field-label">${label}</div><div class="field-value ${cls}">${value || '—'}</div></div>`;
     }
 
+    // REQUIREMENT: Update Modal to mention combinations explicitly[cite: 1, 2]
     function showModal(typeLabel, slno) {
         let title, division, hoa, type, currentAmt, compHtml = "";
         const row = typeLabel === 'Budget' ? dataS1.find(r => r['Sl No.'] === slno) : dataS2.find(r => r['Sl No.'] === slno);
@@ -694,8 +707,13 @@
         currentAmt = row['Amount (₹ in Lakhs)'] || row['Revised Amount (₹ in Lakhs)'];
 
         if (typeLabel === 'Working') {
-            // APPLY MERGED LOGIC FROM SCREENSHOT[cite: 2]
             const originalSlNos = componentMapping[slno] || [];
+            
+            // Check if this scheme is a combination of two original Sl Nos[cite: 2]
+            const isCombination = originalSlNos.length > 1;
+            const mergeNoteHtml = isCombination ? 
+                `<div class="merge-note">Note: This particular is a combination of Sl No. ${originalSlNos.join(' & ')} from the Budget Proposal.</div>` : "";
+
             const originalSum = dataS1.reduce((sum, r) => {
                 return originalSlNos.includes(r['Sl No.']) ? sum + (parseFloat(r['Amount (₹ in Lakhs)']) || 0) : sum;
             }, 0);
@@ -704,7 +722,9 @@
                 <div class="comp-grid">
                     <div class="comp-box"><div class="field-label">Original</div><div class="comp-box-val">₹ ${originalSum.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div></div>
                     <div class="comp-box"><div class="field-label">Revised</div><div class="comp-box-val">₹ ${currentAmt}</div></div>
-                </div></div>`;
+                </div>
+                ${mergeNoteHtml}
+            </div>`;
         }
 
         document.getElementById('modal-title').innerText = title;
