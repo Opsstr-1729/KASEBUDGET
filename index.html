@@ -347,7 +347,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-label">Budget Proposal Amount</div>
+            <div class="stat-label">Total Budget Amount</div>
             <div class="stat-value" id="total-amount-s1">—</div>
             <div class="stat-hint">₹ in Lakhs</div>
         </div>
@@ -359,15 +359,16 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-label">Revised Amount</div>
+            <div class="stat-label">Total Revised Amount</div>
             <div class="stat-value" id="total-amount-s2">—</div>
             <div class="stat-hint">₹ in Lakhs</div>
         </div>
 
-        <div class="stat-card">
+        <!-- UPDATED: Added onclick for HOA Popup -->
+        <div class="stat-card" onclick="showHoaModal()">
             <div class="stat-label">Heads of Account</div>
             <div class="stat-value" id="count-hoa">—</div>
-            <div class="stat-hint">Unique codes</div>
+            <div class="stat-hint">Click to view codes</div>
         </div>
 
         <div class="stat-card">
@@ -473,6 +474,35 @@
         }
     }
 
+    // NEW: Function to show unique Heads of Account and their Types
+    function showHoaModal() {
+        const hoaMap = new Map();
+        
+        // Combine records from both sheets to capture all unique HOA codes and their types
+        [...dataS1, ...dataS2].forEach(row => {
+            const code = (row['Head of Account'] || "").trim();
+            const type = (row['Type'] || "Unknown").trim();
+            if (code && code !== "" && code !== "Total") {
+                hoaMap.set(code, type);
+            }
+        });
+
+        let contentHtml = "";
+        hoaMap.forEach((type, code) => {
+            contentHtml += `
+                <div class="modal-field">
+                    <div class="field-label">Head of Account</div>
+                    <div class="field-value" style="font-weight:700; color:var(--brand);">${code}</div>
+                    <div class="field-label" style="margin-top:8px;">Expenditure Type</div>
+                    <div class="field-value">${type}</div>
+                </div>`;
+        });
+
+        document.getElementById('modal-title').innerText = "Heads of Account Registry";
+        document.getElementById('modal-content').innerHTML = contentHtml || "<p>No account data found.</p>";
+        document.getElementById('modal-overlay').style.display = 'flex';
+    }
+
     function renderBudgetTable() {
         const tbody = document.getElementById('body-s1');
         tbody.innerHTML = dataS1.map(row => `
@@ -534,7 +564,6 @@
             const sourceData = tableId === 'table-s1' ? dataS1 : dataS2;
             const record = sourceData.find(r => r['Sl No.'] === slNo);
             
-            // Search across the visible text, plus hidden division and HOA data
             const division = record ? (record['Division'] || "").toLowerCase() : "";
             const hoa = record ? (record['Head of Account'] || "").toLowerCase() : "";
             
