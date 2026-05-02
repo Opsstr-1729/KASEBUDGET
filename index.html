@@ -229,7 +229,6 @@
             width: 60px;
         }
 
-        /* Summary Row Styles */
         tfoot td {
             padding: 16px 20px;
             background: var(--brand-xlight);
@@ -472,7 +471,6 @@
         </div>
     </div>
 
-    <!-- BUDGET PROPOSALS TABLE -->
     <div class="data-section">
         <div id="budget-section" class="data-section-header">
             <div class="section-title">Budget Proposals</div>
@@ -498,7 +496,7 @@
                 <tbody id="body-s1"></tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="1">Amount</td>
+                        <td colspan="1">Insight</td>
                         <td id="insight-s1">Total for selected: ₹ 0.00 Lakhs</td>
                     </tr>
                 </tfoot>
@@ -506,7 +504,6 @@
         </div>
     </div>
 
-    <!-- WORKING GROUP TABLE -->
     <div class="data-section">
         <div id="working-section" class="data-section-header">
             <div class="section-title">Working Group Proposals</div>
@@ -532,7 +529,7 @@
                 <tbody id="body-s2"></tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="1">Amount</td>
+                        <td colspan="1">Insight</td>
                         <td id="insight-s2">Total for selected: ₹ 0.00 Lakhs</td>
                     </tr>
                 </tfoot>
@@ -559,6 +556,30 @@
     const url1 = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSBA9dF45vgzj6sfu7hmxg7ZCY4ks3_Uki_nmazFVjA8_v6wy9KT9QFMcfuxcT0J5HW262FhBlJEgWG/pub?gid=0&single=true&output=csv";
     const url2 = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSBA9dF45vgzj6sfu7hmxg7ZCY4ks3_Uki_nmazFVjA8_v6wy9KT9QFMcfuxcT0J5HW262FhBlJEgWG/pub?gid=739922821&single=true&output=csv";
 
+    // UPDATED COMPONENT MAPPING FROM YOUR SCREENSHOT[cite: 2]
+    const componentMapping = {
+        "1": ["1"],
+        "2": ["2"],
+        "3": ["3"],
+        "4": ["4"],
+        "5": ["5", "16"],
+        "6": ["7"],
+        "7": ["8"],
+        "8": ["6", "9"],
+        "9": ["10"],
+        "10": ["14"],
+        "11": ["15"],
+        "12": ["17", "18"],
+        "13": ["12", "13"],
+        "14": ["11"],
+        "15": ["19", "20"],
+        "16": ["22"],
+        "17": ["21"],
+        "18": ["23"],
+        "19": ["24"],
+        "20": ["25"]
+    };
+
     let dataS1 = [], dataS2 = [];
 
     async function fetchData() {
@@ -569,7 +590,7 @@
                 populateMultiSelect('multi-div-s1', dataS1, 'table-s1');
                 renderBudgetTable();
                 updateDashboard();
-                filterTable('table-s1'); // Initial insight calculation
+                filterTable('table-s1');
             }
         });
         Papa.parse(url2, {
@@ -579,7 +600,7 @@
                 populateMultiSelect('multi-div-s2', dataS2, 'table-s2');
                 renderWorkingTable();
                 updateDashboard();
-                filterTable('table-s2'); // Initial insight calculation
+                filterTable('table-s2');
             }
         });
     }
@@ -587,7 +608,6 @@
     function populateMultiSelect(containerId, data, tableId) {
         const container = document.querySelector(`#${containerId} .checkbox-list`);
         const divisions = [...new Set(data.map(r => r['Division']).filter(d => d))].sort();
-        
         divisions.forEach(div => {
             const label = document.createElement('label');
             label.className = 'checkbox-item';
@@ -606,21 +626,16 @@
     function updateDashboard() {
         document.getElementById('count-s1').innerText = dataS1.length || '—';
         document.getElementById('count-s2').innerText = dataS2.length || '—';
-
         const totalS1 = dataS1.reduce((sum, row) => sum + (parseFloat(row['Amount (₹ in Lakhs)']) || 0), 0);
         const totalS2 = dataS2.reduce((sum, row) => sum + (parseFloat(row['Revised Amount (₹ in Lakhs)']) || 0), 0);
-        
         document.getElementById('total-amount-s1').innerText = totalS1.toLocaleString('en-IN', { minimumFractionDigits: 2 });
         document.getElementById('total-amount-s2').innerText = totalS2.toLocaleString('en-IN', { minimumFractionDigits: 2 });
-
         const hoas = new Set([...dataS1.map(r => r['Head of Account']?.trim()), ...dataS2.map(r => r['Head of Account']?.trim())]);
         hoas.delete(""); 
         document.getElementById('count-hoa').innerText = hoas.size || '—';
-
         if (dataS2.length > 0) {
             const sCount = dataS2.filter(r => (r['Proposal submitted status'] || "").trim().toLowerCase() === "submitted").length;
             document.getElementById('stat-proposal').innerText = `${sCount} Submitted · ${dataS2.length - sCount} Pending`;
-
             const sanctionedCount = dataS2.filter(r => {
                 const s = (r['Administrative Sanction Status'] || "").trim().toLowerCase();
                 return s !== "" && s !== "nil" && s !== "n/a";
@@ -679,14 +694,17 @@
         currentAmt = row['Amount (₹ in Lakhs)'] || row['Revised Amount (₹ in Lakhs)'];
 
         if (typeLabel === 'Working') {
-            const rowOrig = dataS1.find(r => r['Sl No.'] === slno);
-            if (rowOrig) {
-                compHtml = `<div class="comp-section">
-                    <div class="comp-grid">
-                        <div class="comp-box"><div class="field-label">Original</div><div class="comp-box-val">₹ ${rowOrig['Amount (₹ in Lakhs)']}</div></div>
-                        <div class="comp-box"><div class="field-label">Revised</div><div class="comp-box-val">₹ ${currentAmt}</div></div>
-                    </div></div>`;
-            }
+            // APPLY MERGED LOGIC FROM SCREENSHOT[cite: 2]
+            const originalSlNos = componentMapping[slno] || [];
+            const originalSum = dataS1.reduce((sum, r) => {
+                return originalSlNos.includes(r['Sl No.']) ? sum + (parseFloat(r['Amount (₹ in Lakhs)']) || 0) : sum;
+            }, 0);
+
+            compHtml = `<div class="comp-section">
+                <div class="comp-grid">
+                    <div class="comp-box"><div class="field-label">Original</div><div class="comp-box-val">₹ ${originalSum.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div></div>
+                    <div class="comp-box"><div class="field-label">Revised</div><div class="comp-box-val">₹ ${currentAmt}</div></div>
+                </div></div>`;
         }
 
         document.getElementById('modal-title').innerText = title;
@@ -701,11 +719,9 @@
         const searchInput = document.getElementById(isS1 ? 'input-s1' : 'input-s2');
         const container = document.getElementById(isS1 ? 'multi-div-s1' : 'multi-div-s2');
         const insightElement = document.getElementById(isS1 ? 'insight-s1' : 'insight-s2');
-        
         const checkedDivs = Array.from(container.querySelectorAll('input:checked')).map(cb => cb.value);
         const q = searchInput.value.toLowerCase();
         const rows = document.querySelectorAll(`#${tableId} tbody tr`);
-        
         let runningTotal = 0;
         const sourceData = isS1 ? dataS1 : dataS2;
         const amtKey = isS1 ? 'Amount (₹ in Lakhs)' : 'Revised Amount (₹ in Lakhs)';
@@ -713,24 +729,18 @@
         rows.forEach(row => {
             const slNo = row.cells[0].innerText;
             const record = sourceData.find(r => r['Sl No.'] === slNo);
-            
             const division = record ? (record['Division'] || "") : "";
             const hoa = record ? (record['Head of Account'] || "") : "";
             const text = row.innerText.toLowerCase();
-            
             const matchesSearch = text.includes(q) || division.toLowerCase().includes(q) || hoa.toLowerCase().includes(q);
             const matchesDivision = checkedDivs.length === 0 || checkedDivs.includes(division);
-            
             if (matchesSearch && matchesDivision) {
                 row.style.display = '';
-                if (record) {
-                    runningTotal += parseFloat(record[amtKey]) || 0;
-                }
+                if (record) runningTotal += parseFloat(record[amtKey]) || 0;
             } else {
                 row.style.display = 'none';
             }
         });
-
         insightElement.innerText = `Total for selected: ₹ ${runningTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })} Lakhs`;
     }
 
