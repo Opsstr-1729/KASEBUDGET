@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KASE Budget Monitoring Portal</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
 <style>
 :root {
 --brand: #0e5774;
@@ -16,23 +16,25 @@
 --brand-xlight: #edf7fb;
 --accent: #e8a838;
 --accent-dim: #f5d98c;
---bg: #f0f4f7;
+--bg: #f4f7f9;
 --surface: #ffffff;
---surface-2: #f7fafc;
---border: rgba(14,87,116,0.12);
---border-strong: rgba(14,87,116,0.22);
---text-primary: #0d1f2d;
---text-secondary: #3d6070;
---text-muted: #7a9aaa;
---shadow-sm: 0 1px 3px rgba(14,87,116,0.08), 0 1px 2px rgba(14,87,116,0.06);
---shadow-md: 0 4px 16px rgba(14,87,116,0.1), 0 2px 6px rgba(14,87,116,0.06);
---shadow-lg: 0 12px 36px rgba(14,87,116,0.14), 0 4px 12px rgba(14,87,116,0.08);
---radius-sm: 8px;
---radius-md: 12px;
---radius-lg: 18px;
---radius-xl: 24px;
+--surface-2: #f8fafc;
+--border: rgba(14,87,116,0.1);
+--border-strong: rgba(14,87,116,0.18);
+--text-primary: #0f2537;
+--text-secondary: #426375;
+--text-muted: #7fa0b2;
+--shadow-sm: 0 1px 3px rgba(7,41,58,0.05);
+--shadow-md: 0 6px 20px rgba(7,41,58,0.06), 0 2px 6px rgba(7,41,58,0.04);
+--shadow-lg: 0 16px 48px rgba(7,41,58,0.12), 0 4px 14px rgba(7,41,58,0.06);
+--radius-sm: 6px;
+--radius-md: 10px;
+--radius-lg: 16px;
+--radius-xl: 20px;
 }
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
 font-family: 'DM Sans', sans-serif;
 background: var(--bg);
@@ -41,197 +43,311 @@ min-height: 100vh;
 overflow-x: hidden;
 display: flex;
 flex-direction: column;
+-webkit-font-smoothing: antialiased;
 }
+
+/* Brand Accent Top Border */
+body::before {
+content: "";
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+height: 4px;
+background: linear-gradient(90deg, var(--brand) 0%, var(--brand-mid) 50%, var(--accent) 100%);
+z-index: 101;
+}
+
 .site-header {
-background: var(--brand-deep);
+background: var(--surface);
 padding: 0;
 position: sticky;
 top: 0;
 z-index: 100;
-border-bottom: 1px solid rgba(255,255,255,0.06);
+border-bottom: 1px solid var(--border-strong);
+box-shadow: var(--shadow-sm);
 }
+
 .header-inner {
-max-width: 1280px;
+max-width: 1340px;
 margin: 0 auto;
 padding: 0 32px;
 display: flex;
 align-items: center;
+justify-content: space-between;
 gap: 16px;
-height: 64px;
+height: 85px;
 }
-.header-text { flex: 1; }
-.header-title {
-font-family: 'Syne', sans-serif;
-font-size: 15px;
-font-weight: 700;
-color: #ffffff;
-letter-spacing: 0.2px;
+
+.header-logo-container {
+display: flex;
+align-items: center;
+height: 100%;
 }
-.header-sub {
-font-size: 11px;
-color: rgba(255,255,255,0.4);
-text-transform: uppercase;
+
+.kase-logo {
+height: 58px;
+width: auto;
+object-fit: contain;
+display: block;
 }
+
+.header-badge-wrap {
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
 .header-badge {
-font-size: 11px;
-background: rgba(255,255,255,0.08);
-color: rgba(255,255,255,0.55);
-padding: 4px 12px;
-border-radius: 20px;
+font-family: 'Syne', sans-serif;
+font-size: 12px;
+font-weight: 700;
+background: var(--brand-xlight);
+color: var(--brand);
+padding: 6px 14px;
+border-radius: 30px;
+border: 1px solid rgba(14,87,116,0.15);
+letter-spacing: 0.5px;
 }
+
 .main {
-max-width: 1280px;
+max-width: 1340px;
 margin: 0 auto;
 padding: 40px 32px 80px;
 flex: 1;
 width: 100%;
 }
+
+.page-title-section {
+margin-bottom: 36px;
+border-left: 4px solid var(--brand);
+padding-left: 16px;
+}
+
 .section-eyebrow {
 font-size: 11px;
-font-weight: 500;
+font-weight: 600;
 letter-spacing: 1.5px;
 text-transform: uppercase;
 color: var(--brand-mid);
-margin-bottom: 6px;
+margin-bottom: 4px;
 }
+
 .section-title {
 font-family: 'Syne', sans-serif;
-font-size: 26px;
+font-size: 28px;
 font-weight: 700;
 color: var(--brand-deep);
+letter-spacing: -0.5px;
 }
+
 .stats-grid {
 display: grid;
-grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-gap: 16px;
+grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+gap: 18px;
 margin-bottom: 48px;
 }
+
 .stat-card {
 background: var(--surface);
 border: 1px solid var(--border);
-border-radius: var(--radius-lg);
-padding: 24px;
+border-radius: var(--radius-md);
+padding: 22px 24px;
 cursor: pointer;
-transition: transform 0.2s ease, box-shadow 0.2s ease;
+transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+box-shadow: var(--shadow-sm);
+position: relative;
+overflow: hidden;
 }
+
+.stat-card::after {
+content: "";
+position: absolute;
+bottom: 0;
+left: 0;
+width: 100%;
+height: 3px;
+background: transparent;
+transition: background 0.2s ease;
+}
+
 .stat-card:hover {
-transform: translateY(-3px);
+transform: translateY(-2px);
 box-shadow: var(--shadow-md);
+border-color: var(--brand-light);
 }
+
+.stat-card:hover::after {
+background: var(--brand-mid);
+}
+
 .stat-label {
-font-size: 10px;
+font-size: 11px;
 font-weight: 600;
-letter-spacing: 1px;
+letter-spacing: 0.8px;
 text-transform: uppercase;
 color: var(--text-muted);
-margin-bottom: 12px;
+margin-bottom: 10px;
 }
+
 .stat-value {
 font-family: 'Syne', sans-serif;
-font-size: 30px;
+font-size: 32px;
 font-weight: 700;
 color: var(--brand-deep);
-letter-spacing: -1px;
-line-height: 1;
+letter-spacing: -0.5px;
+line-height: 1.1;
 }
-.stat-value.small { font-size: 18px; line-height: 1.3; }
+
+.stat-value.small { 
+font-family: 'DM Sans', sans-serif; 
+font-size: 16px; 
+font-weight: 600; 
+line-height: 1.4;
+color: var(--text-secondary);
+}
+
 .stat-hint {
 font-size: 11px;
 color: var(--text-muted);
 margin-top: 8px;
+display: flex;
+align-items: center;
+gap: 4px;
 }
-.data-section { margin-bottom: 56px; }
+
+.data-section { 
+margin-bottom: 56px; 
+background: var(--surface);
+padding: 28px;
+border-radius: var(--radius-lg);
+border: 1px solid var(--border);
+box-shadow: var(--shadow-sm);
+}
+
 .data-section-header {
 display: flex;
 justify-content: space-between;
 align-items: center;
-margin-bottom: 20px;
+margin-bottom: 24px;
 gap: 16px;
 flex-wrap: wrap;
 }
+
+.data-section-header .section-title {
+font-size: 22px;
+}
+
 .search-bar {
-padding: 12px 20px;
-width: 320px;
+padding: 11px 18px;
+width: 340px;
 border: 1px solid var(--border-strong);
-border-radius: var(--radius-md);
+border-radius: var(--radius-sm);
 font-size: 14px;
 font-family: 'DM Sans', sans-serif;
+color: var(--text-primary);
 outline: none;
-transition: border-color 0.2s;
+transition: all 0.2s ease;
+background: var(--surface-2);
 }
+
 .search-bar:focus {
-border-color: var(--brand-mid);
-}
-.table-wrap {
+border-color: var(--brand);
 background: var(--surface);
-border: 1px solid var(--border);
-border-radius: var(--radius-lg);
-overflow: visible;
-box-shadow: var(--shadow-sm);
+box-shadow: 0 0 0 3px rgba(14,87,116,0.08);
 }
+
+.table-wrap {
+overflow-x: auto;
+border-radius: var(--radius-sm);
+border: 1px solid var(--border-strong);
+}
+
 table {
 width: 100%;
 border-collapse: collapse;
 text-align: left;
 }
+
 thead th {
-padding: 14px 20px;
+padding: 16px 20px;
 font-size: 11px;
-font-weight: 600;
+font-weight: 700;
 text-transform: uppercase;
-color: var(--text-muted);
-background: var(--surface-2);
-border-bottom: 1px solid var(--border);
+color: var(--brand-dark);
+background: var(--brand-xlight);
+border-bottom: 2px solid var(--border-strong);
 position: relative;
+letter-spacing: 0.5px;
 }
+
 tbody tr {
 border-bottom: 1px solid var(--border);
-cursor: pointer;
+transition: background 0.15s ease;
 }
-tbody tr:hover { background: var(--brand-xlight); }
+
+tbody tr:hover { background: rgba(26,122,159,0.04); }
+
 tbody td {
 padding: 16px 20px;
 font-size: 14px;
+color: var(--text-primary);
+line-height: 1.5;
 }
+
 .sl-cell {
 font-family: 'Syne', sans-serif;
-font-weight: 600;
+font-weight: 700;
 color: var(--brand);
-width: 60px;
+width: 70px;
 }
+
 tfoot td {
-padding: 16px 20px;
+padding: 18px 20px;
 background: var(--brand-xlight);
 font-weight: 700;
 color: var(--brand-deep);
 border-top: 2px solid var(--brand-mid);
+font-size: 14px;
 }
+
 .division-filter-wrap {
 display: inline-block;
 position: relative;
 margin-left: 10px;
 text-transform: none;
 }
+
 .multi-select-btn {
 font-family: 'DM Sans', sans-serif;
-font-size: 10px;
+font-size: 11px;
+font-weight: 500;
 padding: 4px 12px;
 border-radius: 4px;
 border: 1px solid var(--border-strong);
 background: var(--surface);
 cursor: pointer;
-color: var(--brand-mid);
+color: var(--brand-dark);
 min-width: 140px;
 text-align: left;
 display: flex;
 justify-content: space-between;
 align-items: center;
+transition: all 0.2s;
 }
+
+.multi-select-btn:hover {
+background: var(--surface-2);
+border-color: var(--brand-mid);
+}
+
 .multi-select-btn::after {
 content: '▼';
 font-size: 8px;
 margin-left: 8px;
+color: var(--brand-mid);
 }
+
 .multi-select-content {
 display: none;
 position: absolute;
@@ -239,210 +355,321 @@ top: 100%;
 left: 0;
 background: white;
 border: 1px solid var(--border-strong);
-border-radius: 8px;
+border-radius: var(--radius-sm);
 box-shadow: var(--shadow-lg);
 z-index: 10;
-min-width: 250px;
+min-width: 260px;
 max-height: 300px;
 overflow-y: auto;
-padding: 12px;
+padding: 14px;
+margin-top: 4px;
 }
+
 .division-filter-wrap:hover .multi-select-content {
 display: block;
 }
+
 .checkbox-item {
 display: flex;
 align-items: center;
 gap: 10px;
-padding: 6px 0;
-font-size: 12px;
+padding: 7px 0;
+font-size: 13px;
 color: var(--text-secondary);
 cursor: pointer;
+transition: color 0.2s;
 }
+
+.checkbox-item input {
+accent-color: var(--brand);
+}
+
 .checkbox-item:hover {
 color: var(--brand);
 }
+
 .reset-link {
 display: block;
-font-size: 10px;
+font-size: 11px;
+font-weight: 600;
 color: var(--brand-mid);
-text-decoration: underline;
+text-decoration: none;
 margin-bottom: 8px;
 text-align: right;
 cursor: pointer;
 }
+.reset-link:hover { text-decoration: underline; }
+
 .modal-overlay {
 position: fixed;
 inset: 0;
-background: rgba(7,41,58,0.55);
-backdrop-filter: blur(4px);
+background: rgba(7,41,58,0.4);
+backdrop-filter: blur(5px);
 display: none;
 justify-content: center;
 align-items: center;
 z-index: 1000;
 padding: 20px;
 }
+
 .modal {
 background: var(--surface);
 border-radius: var(--radius-xl);
-max-width: 520px;
+max-width: 550px;
 width: 100%;
 max-height: 85vh;
 overflow-y: auto;
-border: 1px solid var(--border);
+border: 1px solid var(--border-strong);
+box-shadow: var(--shadow-lg);
+animation: modalReveal 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+@keyframes modalReveal {
+  from { transform: translateY(15px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
 .modal-header {
 background: var(--brand-deep);
-padding: 28px;
+padding: 24px 28px;
 position: relative;
+border-bottom: 3px solid var(--accent);
 }
+
 .modal-title {
 font-family: 'Syne', sans-serif;
-font-size: 17px;
+font-size: 18px;
 font-weight: 700;
 color: #ffffff;
+line-height: 1.4;
+padding-right: 24px;
 }
+
 .close-btn {
 position: absolute;
-top: 20px;
-right: 20px;
+top: 22px;
+right: 24px;
 background: rgba(255,255,255,0.1);
 border: none;
-border-radius: 8px;
+border-radius: 6px;
 color: white;
 cursor: pointer;
-padding: 5px 10px;
+padding: 6px 12px;
+font-size: 12px;
+transition: background 0.2s;
 }
+.close-btn:hover { background: rgba(255,255,255,0.2); }
+
 .modal-body { padding: 24px 28px; }
+
 .modal-field {
-padding: 14px 0;
+padding: 12px 0;
 border-bottom: 1px solid var(--border);
 }
+.modal-field:last-of-type { border-bottom: none; }
+
 .field-label {
-font-size: 10px;
-font-weight: 600;
+font-size: 11px;
+font-weight: 700;
 text-transform: uppercase;
 color: var(--text-muted);
+letter-spacing: 0.5px;
 }
-.field-value { font-size: 15px; margin-top: 4px; }
+
+.field-value { font-size: 15px; margin-top: 4px; color: var(--text-primary); font-weight: 500; }
 .field-value.amount {
 font-family: 'Syne', sans-serif;
-font-size: 22px;
+font-size: 24px;
 font-weight: 700;
-color: var(--brand-deep);
+color: var(--brand);
+margin-top: 6px;
 }
+
 .comp-section {
-margin-top: 20px;
+margin-top: 24px;
 background: var(--brand-xlight);
 border-radius: var(--radius-md);
 padding: 20px;
+border: 1px solid rgba(14,87,116,0.1);
 }
+
 .merge-note {
-margin-top: 12px;
+margin-top: 14px;
 font-size: 12px;
 font-style: italic;
-color: var(--brand);
-padding: 8px 12px;
-background: white;
-border-radius: 6px;
-border: 1px dashed var(--brand-mid);
-}
-.drop-breakdown-box {
-margin-top: 12px;
-background: #fff5f5;
-border: 1px dashed #f5c2c2;
-border-radius: 6px;
+color: var(--brand-dark);
 padding: 10px 14px;
-}
-.drop-item-title {
-font-size: 12px;
-font-weight: 600;
-color: #b91c1c;
-margin-bottom: 4px;
-}
-.drop-item-detail {
-font-size: 12px;
-color: #7f1d1d;
+background: white;
+border-radius: var(--radius-sm);
+border: 1px dashed var(--brand-strong);
 line-height: 1.4;
 }
+
+.drop-breakdown-box {
+margin-top: 14px;
+background: #fff6f6;
+border: 1px solid #fcdede;
+border-radius: var(--radius-sm);
+padding: 12px 16px;
+}
+
+.drop-item-title {
+font-size: 13px;
+font-weight: 700;
+color: #c92a2a;
+margin-bottom: 6px;
+}
+
+.drop-item-detail {
+font-size: 12.5px;
+color: #5c1d1d;
+line-height: 1.5;
+}
+
 .comp-grid {
 display: grid;
 grid-template-columns: 1fr 1fr;
 gap: 12px;
 }
+
 .comp-box {
 background: var(--surface);
-padding: 14px;
+padding: 12px;
 text-align: center;
 border-radius: var(--radius-sm);
+border: 1px solid var(--border);
 }
+
 .comp-box-val {
 box-sizing: border-box;
 font-family: 'Syne', sans-serif;
 font-size: 18px;
 font-weight: 700;
+color: var(--text-primary);
+margin-top: 4px;
 }
+
 .site-footer {
 background: var(--brand-deep);
-color: rgba(255,255,255,0.5);
-padding: 24px 32px;
+color: rgba(255,255,255,0.45);
+padding: 28px 32px;
 text-align: center;
 font-size: 12px;
 letter-spacing: 0.5px;
 border-top: 1px solid rgba(255,255,255,0.06);
+margin-top: auto;
 }
 
-/* New Comparative Summary Table & Component Accordion Styling */
 .summary-table {
 width: 100%;
 border-collapse: collapse;
-margin-top: 10px;
+margin-top: 12px;
 font-size: 13px;
+border-radius: var(--radius-sm);
+overflow: hidden;
+border: 1px solid var(--border-strong);
 }
+
 .summary-table th, .summary-table td {
-padding: 10px;
+padding: 12px;
 border: 1px solid var(--border-strong);
 text-align: right;
 }
+
 .summary-table th:first-child, .summary-table td:first-child {
 text-align: left;
 font-weight: 600;
 }
-.summary-table th { background: var(--surface-2); font-size: 11px; text-transform: uppercase; color: var(--text-secondary); }
-.summary-table tr.clickable-hoa-row:hover { background: var(--brand-xlight); cursor: pointer; }
-.drop-alert-text { color: #b91c1c; font-weight: 700; }
+
+.summary-table th { 
+background: var(--brand-xlight); 
+font-size: 11px; 
+text-transform: uppercase; 
+color: var(--brand-dark); 
+font-weight: 700;
+}
+
+.summary-table tr.clickable-hoa-row:hover { background: rgba(26,122,159,0.06); cursor: pointer; }
+.drop-alert-text { color: #c92a2a; font-weight: 700; }
+
 .accordion-panel {
 display: none;
 background: var(--surface-2);
-padding: 12px;
-border: 1px solid var(--border);
+padding: 14px;
+border: 1px solid var(--border-strong);
 border-top: none;
 font-size: 12.5px;
 text-align: left !important;
 }
+
 .accordion-list-item {
-padding: 6px 0;
-border-bottom: 1px dashed var(--border);
+padding: 8px 0;
+border-bottom: 1px dashed var(--border-strong);
 display: flex;
 justify-content: space-between;
+align-items: center;
+color: var(--text-primary);
 }
 .accordion-list-item:last-child { border-bottom: none; }
-.accordion-subhead { font-weight: 700; color: var(--brand-dark); margin: 6px 0 2px 0; }
+
+.accordion-subhead { 
+font-weight: 700; 
+color: var(--brand-deep); 
+margin: 12px 0 6px 0; 
+font-size: 12px;
+text-transform: uppercase;
+letter-spacing: 0.3px;
+}
+
+/* Document Viewer Button Styling */
+.view-doc-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand);
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  text-align: center;
+  transition: all 0.2s ease;
+  border: none;
+  width: 100%;
+  box-shadow: var(--shadow-sm);
+  margin-top: 8px;
+  margin-bottom: 12px;
+  letter-spacing: 0.2px;
+}
+.view-doc-btn:hover:not(.disabled) {
+  background: var(--brand-dark);
+  box-shadow: var(--shadow-md);
+}
+.view-doc-btn.disabled {
+  background: #cbd5e1;
+  color: #64748b;
+  opacity: 0.7;
+  cursor: not-allowed;
+  box-shadow: none;
+}
 </style>
 </head>
 <body>
 <header class="site-header">
 <div class="header-inner">
-<div class="header-text">
-<div class="header-title">KASE Budget Monitoring Portal</div>
-<div class="header-sub">Kerala Academy for Skills Excellence</div>
+<div class="header-logo-container">
+<img src="https://lh3.googleusercontent.com/d/1ZPt4G_Eb2YvHfqR7PO3zg4dulEMZB0ym" alt="Kerala Academy for Skills Excellence Logo" class="kase-logo">
 </div>
+<div class="header-badge-wrap">
 <div class="header-badge">FY 2026–27</div>
+</div>
 </div>
 </header>
 <main class="main">
-<div style="margin-bottom: 32px;">
-<div class="section-eyebrow">Overview</div>
+<div class="page-title-section">
+<div class="section-eyebrow">Strategic Allocation & Outlay Overview</div>
 <div class="section-title">Budget Dashboard</div>
 </div>
 <div class="stats-grid">
@@ -454,7 +681,7 @@ justify-content: space-between;
 <div class="stat-card">
 <div class="stat-label">Total Budget Amount</div>
 <div class="stat-value" id="total-amount-s1">—</div>
-<div class="stat-hint">₹ in Lakhs </div>
+<div class="stat-hint">₹ in Lakhs</div>
 </div>
 <div class="stat-card" onclick="scrollToSection('working-section')">
 <div class="stat-label">Working Group Schemes</div>
@@ -464,7 +691,7 @@ justify-content: space-between;
 <div class="stat-card">
 <div class="stat-label">Total Revised Amount</div>
 <div class="stat-value" id="total-amount-s2">—</div>
-<div class="stat-hint">₹ in Lakhs </div>
+<div class="stat-hint">₹ in Lakhs</div>
 </div>
 <div class="stat-card" onclick="showHoaModal()">
 <div class="stat-label">Heads of Account</div>
@@ -489,7 +716,7 @@ justify-content: space-between;
 <table id="table-s1">
 <thead>
 <tr>
-<th style="width:60px;">Sl No.</th>
+<th style="width:75px;">Sl No.</th>
 <th>
 Budget Proposal Particular
 <div class="division-filter-wrap">
@@ -521,7 +748,7 @@ Budget Proposal Particular
 <table id="table-s2">
 <thead>
 <tr>
-<th style="width:60px;">Sl No.</th>
+<th style="width:75px;">Sl No.</th>
 <th>
 Working Group Particular
 <div class="division-filter-wrap">
@@ -560,32 +787,17 @@ Powered by KASE IT Division 2026
 <script>
 const url1 = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSBA9dF45vgzj6sfu7hmxg7ZCY4ks3_Uki_nmazFVjA8_v6wy9KT9QFMcfuxcT0J5HW262FhBlJEgWG/pub?gid=0&single=true&output=csv";
 const url2 = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSBA9dF45vgzj6sfu7hmxg7ZCY4ks3_Uki_nmazFVjA8_v6wy9KT9QFMcfuxcT0J5HW262FhBlJEgWG/pub?gid=739922821&single=true&output=csv";
-
+ 
 const componentMapping = {
-"1": ["1"],
-"2": ["2"],
-"3": ["3"],
-"4": ["4"],
-"5": ["5", "16"],
-"6": ["7"],
-"7": ["8"],
-"8": ["6", "9"],
-"9": ["10"],
-"10": ["14"],
-"11": ["15"],
-"12": ["17", "18"],
-"13": ["12", "13"],
-"14": ["11"],
-"15": ["19", "20"],
-"16": ["22"],
-"17": ["21"],
-"18": ["23"],
-"19": ["24"],
-"20": ["25"]
+"1": ["1"], "2": ["2"], "3": ["3"], "4": ["4"], "5": ["5", "16"],
+"6": ["7"], "7": ["8"], "8": ["6", "9"], "9": ["10"], "10": ["14"],
+"11": ["15"], "12": ["17", "18"], "13": ["12", "13"], "14": ["11"],
+"15": ["19", "20"], "16": ["22"], "17": ["21"], "18": ["23"],
+"19": ["24"], "20": ["25"]
 };
-
+ 
 let dataS1 = [], dataS2 = [];
-
+ 
 async function fetchData() {
 Papa.parse(url1, {
 download: true, header: true,
@@ -608,7 +820,7 @@ filterTable('table-s2');
 }
 });
 }
-
+ 
 function populateMultiSelect(containerId, data, tableId) {
 const container = document.querySelector(`#${containerId} .checkbox-list`);
 container.innerHTML = "";
@@ -620,14 +832,14 @@ label.innerHTML = `<input type="checkbox" value="${div}" onchange="filterTable('
 container.appendChild(label);
 });
 }
-
+ 
 function resetCheckboxes(suffix) {
 const container = document.getElementById(`multi-div-${suffix}`);
 const checkboxes = container.querySelectorAll('input[type="checkbox"]');
 checkboxes.forEach(cb => cb.checked = false);
 filterTable(`table-${suffix}`);
 }
-
+ 
 function updateDashboard() {
 document.getElementById('count-s1').innerText = dataS1.length || '—';
 document.getElementById('count-s2').innerText = dataS2.length || '—';
@@ -648,7 +860,7 @@ return s !== "" && s !== "nil" && s !== "n/a";
 document.getElementById('stat-sanction').innerText = sanctionedCount > 0 ? `${sanctionedCount} Sanctioned` : "NIL";
 }
 }
-
+ 
 function showHoaModal() {
 const targets = ["2230-03-001-96", "2230-03-101-48", "4250-00-190-95"];
 let contentHtml = `
@@ -665,12 +877,12 @@ Click on any Head of Account row below to toggle its individual components and c
 </tr>
 </thead>
 <tbody>`;
-
+ 
 targets.forEach(code => {
 const s1Sum = dataS1.reduce((s, r) => (r['Head of Account'] || "").trim() === code ? s + (parseFloat(r['Amount (₹ in Lakhs)']) || 0) : s, 0);
 const s2Sum = dataS2.reduce((s, r) => (r['Head of Account'] || "").trim() === code ? s + (parseFloat(r['Revised Amount (₹ in Lakhs)']) || 0) : s, 0);
 const drop = s1Sum - s2Sum;
-
+ 
 contentHtml += `
 <tr class="clickable-hoa-row" onclick="toggleHoaAccordion('${code}')">
 <td><strong>${code}</strong></td>
@@ -681,39 +893,35 @@ contentHtml += `
 <tr id="panel-${code}" class="accordion-panel">
 <td colspan="4">
 <div class="accordion-subhead">📁 Original Budget Proposals (Sheet 1)</div>`;
-
+ 
 dataS1.forEach(r => {
 if ((r['Head of Account'] || "").trim() === code) {
 contentHtml += `<div class="accordion-list-item"><span>Sl ${r['Sl No.']}: ${r['Budget Proposal Particular']}</span><strong>₹ ${parseFloat(r['Amount (₹ in Lakhs)']).toFixed(2)}</strong></div>`;
 }
 });
-
+ 
 contentHtml += `<div class="accordion-subhead" style="margin-top:12px;">📋 Working Group Allocations (Sheet 2)</div>`;
 dataS2.forEach(r => {
 if ((r['Head of Account'] || "").trim() === code) {
 contentHtml += `<div class="accordion-list-item"><span>Sl ${r['Sl No.']}: ${r['Working Group Proposal Particular'] || r['Budget Proposal Particular']}</span><strong>₹ ${parseFloat(r['Revised Amount (₹ in Lakhs)']).toFixed(2)}</strong></div>`;
 }
 });
-
+ 
 contentHtml += `</td></tr>`;
 });
-
+ 
 contentHtml += `</tbody></table>`;
-
+ 
 document.getElementById('modal-title').innerText = "Heads of Account Comparative Analysis";
 document.getElementById('modal-content').innerHTML = contentHtml;
 document.getElementById('modal-overlay').style.display = 'flex';
 }
-
+ 
 function toggleHoaAccordion(code) {
 const panel = document.getElementById(`panel-${code}`);
-if (panel.style.display === "table-row") {
-panel.style.display = "none";
-} else {
-panel.style.display = "table-row";
+panel.style.display = (panel.style.display === "table-row") ? "none" : "table-row";
 }
-}
-
+ 
 function renderBudgetTable() {
 const tbody = document.getElementById('body-s1');
 tbody.innerHTML = dataS1.map(row => `
@@ -722,7 +930,7 @@ tbody.innerHTML = dataS1.map(row => `
 <td>${row['Budget Proposal Particular'] || '—'}</td>
 </tr>`).join('');
 }
-
+ 
 function renderWorkingTable() {
 const tbody = document.getElementById('body-s2');
 tbody.innerHTML = dataS2.map(row => `
@@ -731,27 +939,49 @@ tbody.innerHTML = dataS2.map(row => `
 <td>${row['Working Group Proposal Particular'] || '—'}</td>
 </tr>`).join('');
 }
-
+ 
 function field(label, value, cls = '') {
 return `<div class="modal-field"><div class="field-label">${label}</div><div class="field-value ${cls}">${value || '—'}</div></div>`;
 }
-
+ 
 function showModal(typeLabel, slno) {
-let title, division, hoa, type, currentAmt, compHtml = "";
+let title, division, hoa, type, currentAmt, compHtml = "", docBtnHtml = "";
 const row = typeLabel === 'Budget' ? dataS1.find(r => r['Sl No.'] === slno) : dataS2.find(r => r['Sl No.'] === slno);
 if (!row) return;
+
 title = row['Budget Proposal Particular'] || row['Working Group Proposal Particular'];
 division = row['Division'];
 hoa = row['Head of Account'];
 type = row['Type'];
 currentAmt = row['Amount (₹ in Lakhs)'] || row['Revised Amount (₹ in Lakhs)'];
+ 
+let driveLink = "";
+for (let key in row) {
+  if (row[key] && row[key].toString().toLowerCase().includes("google.com")) {
+    driveLink = row[key].toString().trim();
+    break; 
+  }
+}
 
 if (typeLabel === 'Working') {
+  if (driveLink && driveLink !== "N/A" && driveLink !== "File Not Found" && driveLink !== "") {
+    docBtnHtml = `
+      <div style="margin: 8px 0;">
+        <a href="${driveLink}" target="_blank" class="view-doc-btn">
+          📄 View Proposal Document
+        </a>
+      </div>`;
+  } else {
+    docBtnHtml = `
+      <div style="margin: 8px 0;">
+        <button class="view-doc-btn disabled" disabled>📄 Document Unlinked / Missing</button>
+      </div>`;
+  }
+
 const originalSlNos = componentMapping[slno] || [];
 const isCombination = originalSlNos.length > 1;
-const mergeNoteHtml = isCombination ?
-`<div class="merge-note">Note: This particular is a combination of Sl No. ${originalSlNos.join(' & ')} from the Budget Proposal.</div>` : "";
-
+const mergeNoteHtml = isCombination ? `<div class="merge-note">Note: This particular is a combination of Sl No. ${originalSlNos.join(' & ')} from the Budget Proposal.</div>` : "";
+ 
 let componentDetailsHtml = "";
 const originalSum = dataS1.reduce((sum, r) => {
 if (originalSlNos.includes(r['Sl No.'])) {
@@ -761,7 +991,7 @@ return sum + originalItemAmt;
 }
 return sum;
 }, 0);
-
+ 
 const dropVal = originalSum - parseFloat(currentAmt);
 let dropBreakdownHtml = "";
 if (dropVal > 0) {
@@ -769,8 +999,7 @@ dropBreakdownHtml = `
 <div class="drop-breakdown-box">
 <div class="drop-item-title">📉 Allocation Reduction Found (Drop: ₹ ${dropVal.toLocaleString('en-IN', { minimumFractionDigits: 2 })} Lakhs)</div>
 <div class="drop-item-detail">
-<strong>Source Component Breakdown:</strong><br>
-${componentDetailsHtml}
+<strong>Source Component Breakdown:</strong><br>${componentDetailsHtml}
 <strong>Revised Allocation:</strong> ₹ ${parseFloat(currentAmt).toLocaleString('en-IN', { minimumFractionDigits: 2 })} Lakhs
 </div>
 </div>`;
@@ -778,37 +1007,33 @@ ${componentDetailsHtml}
 dropBreakdownHtml = `
 <div class="drop-breakdown-box" style="background:#f0fdf4; border-color:#bbf7d0;">
 <div class="drop-item-title" style="color:#16a34a;">📈 Allocation Budget Surge (+ ₹ ${Math.abs(dropVal).toLocaleString('en-IN', { minimumFractionDigits: 2 })} Lakhs)</div>
-<div class="drop-item-detail" style="color:#14532d;">
-Budget expansion applied relative to the source configuration.
-</div>
+<div class="drop-item-detail" style="color:#14532d;">Budget expansion applied relative to the source configuration.</div>
 </div>`;
 } else {
 dropBreakdownHtml = `
 <div class="drop-breakdown-box" style="background:#f8fafc; border-color:#e2e8f0;">
 <div class="drop-item-title" style="color:#475569;">⚖️ Allocation Maintained</div>
-<div class="drop-item-detail" style="color:#334155;">
-The allocated funds match the source initialization parameter identically.
-</div>
+<div class="drop-item-detail" style="color:#334155;">The allocated funds match the source initialization parameter identically.</div>
 </div>`;
 }
-
+ 
 compHtml = `<div class="comp-section">
-<div class="comp-grid">
-<div class="comp-box"><div class="field-label">Original</div><div class="comp-box-val">₹ ${originalSum.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div></div>
-<div class="comp-box"><div class="field-label">Revised</div><div class="comp-box-val">₹ ${parseFloat(currentAmt).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div></div>
-</div>
-${mergeNoteHtml}
-${dropBreakdownHtml}
+  <div class="comp-grid">
+    <div class="comp-box"><div class="field-label">Original</div><div class="comp-box-val">₹ ${originalSum.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div></div>
+    <div class="comp-box"><div class="field-label">Revised</div><div class="comp-box-val">₹ ${parseFloat(currentAmt).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div></div>
+  </div>
+  ${mergeNoteHtml}
+  ${dropBreakdownHtml}
 </div>`;
 }
-
+ 
 document.getElementById('modal-title').innerText = title;
-document.getElementById('modal-content').innerHTML = field('Division', division) + field('Head of Account', hoa) + field('Type', type) + field('Amount (₹ in Lakhs)', `₹ ${parseFloat(currentAmt).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`, 'amount') + compHtml;
+document.getElementById('modal-content').innerHTML = field('Division', division) + field('Head of Account', hoa) + field('Type', type) + field('Amount (₹ in Lakhs)', `₹ ${parseFloat(currentAmt).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`, 'amount') + docBtnHtml + compHtml;
 document.getElementById('modal-overlay').style.display = 'flex';
 }
-
+ 
 function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; }
-
+ 
 function filterTable(tableId) {
 const isS1 = tableId === 'table-s1';
 const searchInput = document.getElementById(isS1 ? 'input-s1' : 'input-s2');
@@ -837,7 +1062,7 @@ row.style.display = 'none';
 });
 insightElement.innerText = `Total for selected: ₹ ${runningTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })} Lakhs`;
 }
-
+ 
 function scrollToSection(id) { document.getElementById(id).scrollIntoView({ behavior: 'smooth' }); }
 fetchData();
 </script>
